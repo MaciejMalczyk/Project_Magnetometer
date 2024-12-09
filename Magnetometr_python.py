@@ -5,7 +5,7 @@ import serial
 from fontTools.misc.cython import returns
 # algorytmy: Levenberg Marquat,
 #definicja połączenia z portem szeregowym
-def fun():
+def magnetometerReadData():
     try:
         with serial.Serial('COM7', 115200, timeout=1) as dev:
             #wysłanie komendy do podania danych
@@ -41,7 +41,3 @@ def fun():
     except Exception as e:
         print("Error occured: ",e)
         return 0
-
-
-
-print(fun())
