@@ -1,10 +1,5 @@
-import sys
-from webbrowser import Error
-
 import serial
-from fontTools.misc.cython import returns
-# algorytmy: Levenberg Marquat,
-#definicja połączenia z portem szeregowym
+
 def magnetometerReadData():
     try:
         with serial.Serial('COM7', 115200, timeout=1) as dev:
