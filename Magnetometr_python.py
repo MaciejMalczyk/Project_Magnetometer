@@ -1,13 +1,14 @@
 import serial
+import time
 
-def magnetometerReadData():
+def magnetometerReadData(start_time):
     try:
         with serial.Serial('COM7', 115200, timeout=1) as dev:
             #wysłanie komendy do podania danych
             dev.write(bytearray([0x03,0,0,0,0,0]))
-            rxbit_aliases = ["x", "y", "z", "s"]
+            rxbit_aliases = ["t","x", "y", "z", "s"]
             rxbit_str = ["","","","","",""]
-            res = dict(x=0, y=0, z=0, s=0)
+            res = dict(t=round(time.time()-start_time,1), x=0, y=0, z=0, s=0)
             i=0
             for x in range(31):
                 #odczytywanie jednego bajta danych
@@ -26,9 +27,9 @@ def magnetometerReadData():
                 if ((x+1) % 6 == 0):
                     if not ((x+1)/6 == 1):
                         if rxbit_str[i][12] == "1":
-                            res[rxbit_aliases[i-1]] = -1 * int(rxbit_str[i][16:], 2) / pow(10, int(rxbit_str[i][13:16], 2))
+                            res[rxbit_aliases[i]] = -1 * int(rxbit_str[i][16:], 2) / pow(10, int(rxbit_str[i][13:16], 2))
                         else:
-                            res[rxbit_aliases[i-1]] = int(rxbit_str[i][16:], 2) / pow(10, int(rxbit_str[i][13:16], 2))
+                            res[rxbit_aliases[i]] = int(rxbit_str[i][16:], 2) / pow(10, int(rxbit_str[i][13:16], 2))
                     i+=1
         # return measurements
         return res
