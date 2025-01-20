@@ -21,6 +21,7 @@ def saveData(data, file_name):
 
 
 start_time = round(time.time(),1)
+magnetometer = Magnetometer(start_time)
 file_name = datetime.now().strftime("%Y-%m-%d_%H;%M;%S") + '.csv'
 while (time.time()-start_time<61200):
-    saveData(magnetometerReadData(start_time),file_name)
+    saveData(magnetometer.readData(),file_name)

@@ -1,4 +1,4 @@
-from Project_Magnetometer.Magnetometr_python import magnetometerReadData
+from Project_Magnetometer.Magnetometr_python import Magnetometer
 from Project_Magnetometer.Power_supplier import powerSupplierOn, powerSupplierMeasurementVoltage, \
     powerSupplierSetVoltage
 import time
@@ -8,10 +8,11 @@ IpPowerSupplier={"big":"192.168.88.202", "medium":"192.168.88.203", "small":"192
 powerSupplierOn(IpPowerSupplier["big"])
 powerSupplierOn(IpPowerSupplier["medium"])
 powerSupplierOn(IpPowerSupplier["small"])
-interval=0.5
-
+interval=0.2
+multiplier=0.01
+magnetometer = Magnetometer(round(time.time(),1))
 while True:
-    res = magnetometerReadData(0)
+    res = magnetometer.readData()
     x_d = 0-res["x"]
     y_d = 0-res["y"]
     z_d = 0-res["z"]
@@ -21,26 +22,26 @@ while True:
 
     print(x_d, y_d, z_d)
     if (x_d < - interval):
-        powerSupplierSetVoltage(IpPowerSupplier["big"], x_v - x_d*0.002)
+        powerSupplierSetVoltage(IpPowerSupplier["big"], x_v - x_d * multiplier)
 
     if (x_d > interval):
-        powerSupplierSetVoltage(IpPowerSupplier["big"], x_v - x_d * 0.002)
+        powerSupplierSetVoltage(IpPowerSupplier["big"], x_v - x_d * multiplier)
 
     # print(f"z_d: {y_d}, z_v: {y_v}")
     if (y_d < - interval):
-        powerSupplierSetVoltage(IpPowerSupplier["medium"], y_v + y_d * 0.002)
+        powerSupplierSetVoltage(IpPowerSupplier["medium"], y_v + y_d * multiplier)
         # print(f"S: {y_v + y_d * 0.002}")
 
     if (y_d > interval):
-        powerSupplierSetVoltage(IpPowerSupplier["medium"], y_v + y_d * 0.002)
+        powerSupplierSetVoltage(IpPowerSupplier["medium"], y_v + y_d * multiplier)
         # print(f"S: {y_v + y_d * 0.002}")
 
     # print(f"z_d: {z_d}, z_v: {z_v}")
     if (z_d < - interval):
-        powerSupplierSetVoltage(IpPowerSupplier["small"], z_v + z_d * 0.002)
+        powerSupplierSetVoltage(IpPowerSupplier["small"], z_v + z_d * multiplier)
         # print(f"S: {z_v - z_d * 0.002}")
 
     if (z_d > interval):
-        powerSupplierSetVoltage(IpPowerSupplier["small"], z_v + z_d * 0.002)
+        powerSupplierSetVoltage(IpPowerSupplier["small"], z_v + z_d * multiplier)
         # print(f"S: {z_v - z_d * 0.002}")
 
