@@ -1,25 +1,28 @@
 import serial
 import time
+import sys
 
 class Magnetometer:
-    def __init__(self,start_time):
-        self.start_time=start_time
+    def __init__(self, serial_port):
+        self.serial_port = serial_port
     def readData(self):
         try:
-            with serial.Serial('COM7', 115200, timeout=1) as dev:
-                #wysłanie komendy do podania danych
+            with serial.Serial(self.serial_port, 115200, timeout=1) as dev:
+                # command to access data
                 dev.write(bytearray([0x03,0,0,0,0,0]))
+
                 rxbit_aliases = ["t","x", "y", "z", "s"]
                 rxbit_str = ["","","","","",""]
-                res = dict(t=round(time.time()-self.start_time,1), x=0, y=0, z=0, s=0)
+                res = dict(x=0, y=0, z=0, s=0)
                 i=0
+
                 for x in range(31):
-                    #odczytywanie jednego bajta danych
+                    # read one byte of data
                     rx = dev.read(1)
-                    #konwertowanie jednego bajta danych na jego reprezentacje bitową w formie stringa
+                    # data to binary string
                     rxbit = bin(int.from_bytes(rx, byteorder='big'))[2:]
 
-                    #uzupełniane brakujących zer na początku
+                    # fill zeros on left side
                     if len(rxbit) < 8:
                         for y in range(8-len(rxbit)):
                             rxbit_str[i] += "0"
@@ -34,9 +37,10 @@ class Magnetometer:
                             else:
                                 res[rxbit_aliases[i]] = int(rxbit_str[i][16:], 2) / pow(10, int(rxbit_str[i][13:16], 2))
                         i+=1
+
             # return measurements
             return res
         # exception handler
         except Exception as e:
-            print("Error occured: ",e)
-            return 0
+            print("Error occured: ", e)
+            sys.exit()

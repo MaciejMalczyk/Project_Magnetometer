@@ -1,47 +1,45 @@
-from Project_Magnetometer.Magnetometr_python import Magnetometer
-from Project_Magnetometer.Power_supplier import powerSupplierOn, powerSupplierMeasurementVoltage, \
-    powerSupplierSetVoltage
-import time
+from magnetometer import Magnetometer
+from powerSupply import powerSupplyOn, powerSupplyMeasurementVoltage, powerSupplySetVoltage
 
 # x - big, z - small, y - medium
-IpPowerSupplier={"big":"192.168.88.202", "medium":"192.168.88.203", "small":"192.168.88.201"}
-powerSupplierOn(IpPowerSupplier["big"])
-powerSupplierOn(IpPowerSupplier["medium"])
-powerSupplierOn(IpPowerSupplier["small"])
+powerSupplyIp={"big":"192.168.88.202", "medium":"192.168.88.203", "small":"192.168.88.201"}
+
+powerSupplyOn(powerSupplyIp["big"])
+powerSupplyOn(powerSupplyIp["medium"])
+powerSupplyOn(powerSupplyIp["small"])
+
 interval=0.2
 multiplier=0.01
-magnetometer = Magnetometer(round(time.time(),1))
+
+magnetometer = Magnetometer("/dev/ttyUSB0")
+
 while True:
+
+    # This is correct for fixed orientation. Modify >, < and - symbols for other orientations.
     res = magnetometer.readData()
     x_d = 0-res["x"]
     y_d = 0-res["y"]
     z_d = 0-res["z"]
-    x_v = powerSupplierMeasurementVoltage(IpPowerSupplier["big"])
-    y_v = powerSupplierMeasurementVoltage(IpPowerSupplier["medium"])
-    z_v = powerSupplierMeasurementVoltage(IpPowerSupplier["small"])
+    x_v = powerSupplyMeasurementVoltage(powerSupplyIp["big"])
+    y_v = powerSupplyMeasurementVoltage(powerSupplyIp["medium"])
+    z_v = powerSupplyMeasurementVoltage(powerSupplyIp["small"])
 
-    print(x_d, y_d, z_d)
     if (x_d < - interval):
-        powerSupplierSetVoltage(IpPowerSupplier["big"], x_v - x_d * multiplier)
+        powerSupplySetVoltage(powerSupplyIp["big"], x_v - x_d * multiplier)
 
     if (x_d > interval):
-        powerSupplierSetVoltage(IpPowerSupplier["big"], x_v - x_d * multiplier)
+        powerSupplySetVoltage(powerSupplyIp["big"], x_v - x_d * multiplier)
 
-    # print(f"z_d: {y_d}, z_v: {y_v}")
     if (y_d < - interval):
-        powerSupplierSetVoltage(IpPowerSupplier["medium"], y_v + y_d * multiplier)
-        # print(f"S: {y_v + y_d * 0.002}")
+        powerSupplySetVoltage(powerSupplyIp["medium"], y_v + y_d * multiplier)
 
     if (y_d > interval):
-        powerSupplierSetVoltage(IpPowerSupplier["medium"], y_v + y_d * multiplier)
-        # print(f"S: {y_v + y_d * 0.002}")
+        powerSupplySetVoltage(powerSupplyIp["medium"], y_v + y_d * multiplier)
 
-    # print(f"z_d: {z_d}, z_v: {z_v}")
     if (z_d < - interval):
-        powerSupplierSetVoltage(IpPowerSupplier["small"], z_v + z_d * multiplier)
-        # print(f"S: {z_v - z_d * 0.002}")
+        powerSupplySetVoltage(powerSupplyIp["small"], z_v + z_d * multiplier)
 
     if (z_d > interval):
-        powerSupplierSetVoltage(IpPowerSupplier["small"], z_v + z_d * multiplier)
-        # print(f"S: {z_v - z_d * 0.002}")
+        powerSupplySetVoltage(powerSupplyIp["small"], z_v + z_d * multiplier)
+
 
